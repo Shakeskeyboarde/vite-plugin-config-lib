@@ -12,7 +12,8 @@
     "start": "vite",
     "build": "vite build",
     "test": "eslint . --max-warnings=0 && vitest run --pass-with-no-tests",
-    "open-coverage": "open out/coverage/index.html"
+    "open-coverage": "open out/coverage/index.html",
+    "prepublishOnly": "pnpm build && pnpm test"
   },
   "files": [
     "dist"
