@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "vite-plugin-auto-lib",
   "description": "Vite plugin that configures sane defaults for building libraries.",
   "version": "0.0.1",
