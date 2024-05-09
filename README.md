@@ -1,4 +1,4 @@
-# Vite Plugin Auto Lib
+# Vite Plugin Config Lib
 
 Vite plugin that configures sane defaults for building libraries.
 
@@ -7,14 +7,14 @@ Vite plugin that configures sane defaults for building libraries.
 Install the plugin:
 
 ```sh
-npm install vite-plugin-auto-lib --save-dev
+npm install vite-plugin-config-lib --save-dev
 ```
 
 Add the plugin to your `vite.config.js`:
 
 ```ts
 import { defineConfig } from 'vite';
-import { lib } from 'vite-plugin-auto-lib';
+import { lib } from 'vite-plugin-config-lib';
 
 export default defineConfig({
   plugins: [lib()]

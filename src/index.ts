@@ -9,7 +9,7 @@ import { type Plugin, type UserConfig } from 'vite';
  */
 export const lib = (): Plugin => {
   return {
-    name: 'vite-plugin-auto-lib',
+    name: 'vite-plugin-config-lib',
     async config(current) {
       const root = current.root ?? process.cwd();
       const pkg = await getPackage(root);

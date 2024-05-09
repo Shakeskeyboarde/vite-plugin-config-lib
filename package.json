@@ -1,11 +1,11 @@
 {
-  "name": "vite-plugin-auto-lib",
+  "name": "vite-plugin-config-lib",
   "description": "Vite plugin that configures sane defaults for building libraries.",
   "version": "0.0.1",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Shakeskeyboarde/vite-plugin-auto-lib.git"
+    "url": "https://github.com/Shakeskeyboarde/vite-plugin-config-lib.git"
   },
   "scripts": {
     "start": "vite",
