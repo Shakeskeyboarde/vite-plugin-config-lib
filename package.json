@@ -1,12 +1,12 @@
 {
   "private": true,
-  "name": "UNTITLED",
-  "description": "",
-  "version": "0.0.0-prerelease",
+  "name": "vite-plugin-auto-lib",
+  "description": "Vite plugin that configures sane defaults for building libraries.",
+  "version": "0.0.1",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Shakeskeyboarde/UNTITLED.git"
+    "url": "https://github.com/Shakeskeyboarde/vite-plugin-auto-lib.git"
   },
   "scripts": {
     "start": "vite",
@@ -15,11 +15,10 @@
     "open-coverage": "open out/coverage/index.html"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "publishConfig": {
-    "access": "public",
-    "tag": "prerelease"
+    "access": "public"
   },
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -35,9 +34,11 @@
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8",
     "eslint-config-rational": "^5.0.13",
+    "rollup-plugin-node-externals": "^7.1.2",
     "typescript": "^5.4.5",
     "vite": "^5.2.11",
     "vite-plugin-checker": "^0.6.4",
+    "vite-plugin-dts": "^3.9.1",
     "vitest": "^1.6.0"
   }
 }
