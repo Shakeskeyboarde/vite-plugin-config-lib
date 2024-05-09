@@ -1,0 +1,43 @@
+{
+  "private": true,
+  "name": "UNTITLED",
+  "description": "",
+  "version": "0.0.0-prerelease",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shakeskeyboarde/UNTITLED.git"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "test": "eslint . --max-warnings=0 && vitest run --pass-with-no-tests",
+    "open-coverage": "open out/coverage/index.html"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "prerelease"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "packageManager": "pnpm@9.1.0+sha256.22e36fba7f4880ecf749a5ca128b8435da085ecd49575e7fb9e64d6bf4fad394",
+  "devDependencies": {
+    "@types/node": "^20.12.11",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^8",
+    "eslint-config-rational": "^5.0.13",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vite-plugin-checker": "^0.6.4",
+    "vitest": "^1.6.0"
+  }
+}
