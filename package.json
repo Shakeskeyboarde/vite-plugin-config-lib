@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-config-lib",
   "description": "Vite plugin that configures sane defaults for building libraries.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "ISC",
   "repository": {
     "type": "git",
@@ -11,8 +11,8 @@
     "start": "vite",
     "build": "vite build",
     "test": "eslint . --max-warnings=0 && vitest run --pass-with-no-tests",
-    "open-coverage": "open out/coverage/index.html",
-    "prepublishOnly": "pnpm build && pnpm test"
+    "prepublishOnly": "pnpm build && pnpm test",
+    "open-coverage": "open out/coverage/index.html"
   },
   "files": [
     "dist"
