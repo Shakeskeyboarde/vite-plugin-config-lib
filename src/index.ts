@@ -17,7 +17,6 @@ export const lib = (): Plugin => {
       Object.assign(current, {
         root,
         build: {
-          target: 'esnext',
           sourcemap: true,
           ...current.build,
           lib: {
