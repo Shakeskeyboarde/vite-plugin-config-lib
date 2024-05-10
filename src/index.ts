@@ -18,6 +18,7 @@ export const lib = (): Plugin => {
         root,
         build: {
           sourcemap: true,
+          minify: false,
           ...current.build,
           lib: {
             formats: pkg?.type === 'module' ? ['es'] : ['cjs'],

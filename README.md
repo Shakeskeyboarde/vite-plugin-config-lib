@@ -47,6 +47,7 @@ Multiple entrypoints can be detected. However, if the same prefix exists with mu
 ## Config Defaults
 
 - `build.sourcemap`: `true`
+- `build.minify`: `false`
 - `build.lib.formats`: Auto-detected from the `type` field in the nearest
   `package.json` file.
 - `build.lib.fileName`: `'[name]'`
@@ -59,11 +60,13 @@ Multiple entrypoints can be detected. However, if the same prefix exists with mu
 
 Some of the above defaults are generally the only options that make sense for a library. Others are more opinionated, but should probably be correct for most projects.
 
-Source maps are enabled by default. This doesn't hurt anything, and is almost always the correct choice so that consumers can reference them in-place, or use them to generate correct source maps of their own.
+Source maps are enabled by default. This doesn't hurt anything, and is almost always the correct choice so that consumers can reference them in-place, or use them to generate correct bundle source maps of their own.
 
-The lib `fileName` and Rollup `preserveModules` options cause the build output files to map 1:1 with build inputs. Bundling is not necessary in a library, and can even be harmful to consumer treeshaking. Consumers can always choose to bundle if that's the correct choice for their environment or performance needs. This also allows for sub-path exports and generating type definition files adjacent to their corresponding source files.
+Minification is disabled by default. Disabling it avoids some potential issues and provides a better debugging experience for consumers. Minification can be a performance optimization, but that's generally also paired with bundling, which can be done by consumers if necessary.
 
-With `preserveModules` enabled, externalization is almost a requirement. A basic externalization configuration is provided that externalizes NodeJS built-ins, native modules, and production dependencies. If better externalization support is needed, add the [rollup-plugin-node-externals](https://www.npmjs.com/package/rollup-plugin-node-externals) plugin which will override the built-in solution.
+The lib `fileName` and Rollup `preserveModules` defaults cause the build output files to map 1:1 with build inputs. Bundling is not necessary in a library, and can even be harmful if consumers are treeshaking. This also allows for sub-path exports and generating type definition files adjacent to their corresponding source files. Consumers can always choose to bundle if that's the correct choice for their environment or performance needs.
+
+Externalization is generally necessary with `preserveModules` enabled. A basic externalization default configuration is provided that handles NodeJS built-ins, native modules, and production dependencies. If more advanced externalization support is needed, use the [rollup-plugin-node-externals](https://www.npmjs.com/package/rollup-plugin-node-externals) plugin which will override the default solution.
 
 Tree shaking is disabled by default. It's safe to assume that consumers will do their own treeshaking if necessary. Disabling it also avoids issues related to side effects.
 

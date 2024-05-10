@@ -14,7 +14,6 @@ export default defineConfig({
     dts({ entryRoot: 'src', logLevel: 'error', exclude: TEST_GLOBS }),
   ],
   build: {
-    target: 'esnext',
     sourcemap: true,
     minify: false,
     lib: {
