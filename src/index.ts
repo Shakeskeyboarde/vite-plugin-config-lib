@@ -46,6 +46,7 @@ export const lib = (options?: Options): Plugin => {
           sourcemap: true,
           minify: false,
           ...current.build,
+          target,
           lib: {
             formats: pkg?.type === 'module' ? ['es'] : ['cjs'],
             fileName: '[name]',
