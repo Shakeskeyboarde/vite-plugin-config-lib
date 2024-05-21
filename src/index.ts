@@ -2,16 +2,42 @@ import fs from 'node:fs/promises';
 import module from 'node:module';
 import path from 'node:path';
 
-import { type Plugin, type UserConfig } from 'vite';
+import { type LibraryOptions, type Plugin, type Rollup, type UserConfig } from 'vite';
+
+interface Options {
+  /**
+   * Shortcut for overriding the default `build.lib.entry` auto-detection.
+   */
+  entry?: string | string[];
+  /**
+   * Shortcut for `build.target`. If only node is targeted, then
+   * `resolve.conditions` is also defaulted to include `node`.
+   */
+  target?: string | string[] | false;
+  /**
+   * Shortcut for setting `build.rollupOptions.output.preserveModules`. Setting
+   * this option to false will set `preserveModules` to true, and vice versa.
+   */
+  bundle?: boolean;
+  /**
+   * Shortcut for `build.rollupOptions.external`. If set to false, only
+   * Node.js built-ins are considered external.
+   */
+  external?: Rollup.ExternalOption | false;
+}
 
 /**
  * Vite plugin that configures sane defaults for building libraries.
  */
-export const lib = (): Plugin => {
+export const lib = (options?: Options): Plugin => {
   return {
     name: 'vite-plugin-config-lib',
     async config(current) {
       const root = current.root ?? process.cwd();
+      const target = current.build?.target ?? options?.target;
+      const isNodeTarget = (Array.isArray(target) ? target : [target])
+        .every((value) => value && /^node/iu.test(value));
+      const libPartial: Partial<LibraryOptions> = current.build?.lib || {};
       const pkg = await getPackage(root);
 
       Object.assign(current, {
@@ -23,18 +49,22 @@ export const lib = (): Plugin => {
           lib: {
             formats: pkg?.type === 'module' ? ['es'] : ['cjs'],
             fileName: '[name]',
-            entry: await getDefaultEntry(root),
-            ...current.build?.lib || {},
+            entry: options?.entry ?? await getDefaultEntry(root),
+            ...libPartial,
           },
           rollupOptions: {
             treeshake: false,
-            external: getExternal(pkg),
+            external: options?.external === false ? module.isBuiltin : options?.external ?? getExternal(pkg),
             ...current.build?.rollupOptions,
             output: {
-              preserveModules: true,
+              preserveModules: !options?.bundle,
               ...current.build?.rollupOptions?.output,
             },
           },
+        },
+        resolve: {
+          conditions: isNodeTarget ? ['node'] : undefined,
+          ...current.resolve,
         },
       } satisfies UserConfig);
     },
