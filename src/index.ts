@@ -7,34 +7,83 @@ import { type LibraryOptions, type Plugin, type Rollup, type UserConfig } from '
 interface Options {
   /**
    * Shortcut for overriding the default `build.lib.entry` auto-detection.
+   *
+   * Auto detection uses any (all) of the following files that exist:
+   * - `index.*`
+   * - `bin.*`
+   * - `main.*`
+   * - `src/index.*`
+   * - `src/bin.*`
+   * - `src/main.*`
+   *
+   * Where the extension (`.*`) is one of the following:
+   *
+   * - `.ts`
+   * - `.tsx`
+   * - `.mts`
+   * - `.cts`
+   * - `.js`
+   * - `.jsx`
+   * - `.mjs`
+   * - `.cjs`
    */
   entry?: string | string[];
   /**
-   * Shortcut for `build.target`. If only node is targeted, then
+   * Shortcut for `build.target`. This only performs syntax transforms and does
+   * not include polyfills.
+   *
+   * Defaults to `esnext` which only performs minimal transpiling for
+   * minification compatibility.
+   *
+   * If only NodeJS is targeted (all strings start with `node`), then
    * `resolve.conditions` is also defaulted to include `node`.
    */
   target?: string | string[] | false;
   /**
-   * Shortcut for setting `build.rollupOptions.output.preserveModules`. Setting
-   * this option to false will set `preserveModules` to true, and vice versa.
+   * When true, multiple input files may be combined into fewer output files,
+   * and input file names and paths will not be preserved in the output
+   * directory.
+   *
+   * When false, each input file will map to a single output file, with the
+   * same relative base path and name. The extension may change to reflect
+   * transpilation.
+   *
+   * Defaults to false.
    */
   bundle?: boolean;
   /**
-   * Shortcut for `build.rollupOptions.external`. If set to false, only
-   * Node.js built-ins are considered external.
+   * Shortcut for `build.rollupOptions.external`. Can be an array of strings
+   * and regular expressions, a function, or one of the following presets:
+   * `auto`, `node`, or `none`.
+   *
+   * - `none`: Nothing is external.
+   * - `node`: Only Node built-ins are external.
+   * - `auto`: Node built-ins and production dependencies are external.
+   *
+   * The default is `node` if the `bundle` option is true. Otherwise, the
+   * default is `auto`.
+   *
+   * **NOTE:** It is strongly recommended to use the `auto` preset (default)
+   * when bundle is true. Otherwise, the output directory may contain a
+   * `node_modules` directory structure.
    */
-  external?: Rollup.ExternalOption | false;
+  external?: Exclude<Rollup.ExternalOption, string | RegExp> | 'none' | 'node' | 'auto';
 }
 
 /**
  * Vite plugin that configures sane defaults for building libraries.
  */
-export const lib = (options?: Options): Plugin => {
+export const lib = ({
+  target: targetOverride = 'esnext',
+  entry,
+  bundle = false,
+  external = bundle ? 'node' : 'auto',
+}: Options = {}): Plugin => {
   return {
     name: 'vite-plugin-config-lib',
     async config(current) {
       const root = current.root ?? process.cwd();
-      const target = current.build?.target ?? options?.target;
+      const target = current.build?.target ?? targetOverride;
       const isNodeTarget = (Array.isArray(target) ? target : [target])
         .every((value) => value && /^node/iu.test(value));
       const libPartial: Partial<LibraryOptions> = current.build?.lib || {};
@@ -50,15 +99,21 @@ export const lib = (options?: Options): Plugin => {
           lib: {
             formats: pkg?.type === 'module' ? ['es'] : ['cjs'],
             fileName: '[name]',
-            entry: options?.entry ?? await getDefaultEntry(root),
+            entry: entry ?? await getDefaultEntry(root),
             ...libPartial,
           },
           rollupOptions: {
             treeshake: false,
-            external: options?.external === false ? module.isBuiltin : options?.external ?? getExternal(pkg),
+            external: external === 'none'
+              ? undefined
+              : external === 'node'
+                ? module.isBuiltin
+                : external === 'auto'
+                  ? getExternal(pkg)
+                  : external,
             ...current.build?.rollupOptions,
             output: {
-              preserveModules: !options?.bundle,
+              preserveModules: !bundle,
               ...current.build?.rollupOptions?.output,
             },
           },
@@ -98,11 +153,11 @@ const getDefaultEntry = async (root: string): Promise<string[]> => {
   return entry;
 };
 
-const getPackage = async (dir: string): Promise<any> => {
-  dir = path.resolve(dir);
+const getPackage = async (root: string): Promise<any> => {
+  root = path.resolve(root);
 
   try {
-    const txt = await fs.readFile(path.join(dir, 'package.json'), 'utf-8');
+    const txt = await fs.readFile(path.join(root, 'package.json'), 'utf-8');
     const pkg = JSON.parse(txt);
 
     return pkg;
@@ -112,9 +167,9 @@ const getPackage = async (dir: string): Promise<any> => {
       throw error;
     }
 
-    const nextDir = path.dirname(dir);
+    const nextDir = path.dirname(root);
 
-    if (nextDir !== dir) {
+    if (nextDir !== root) {
       return await getPackage(nextDir);
     }
   }
